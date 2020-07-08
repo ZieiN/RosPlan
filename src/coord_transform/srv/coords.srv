@@ -1,0 +1,4 @@
+nav_msgs/MapMetaData info
+geometry_msgs/Pose input
+---
+geometry_msgs/Pose output

@@ -1,0 +1,8 @@
+prefix=/home/vlad/husky_driver/devel
+
+Name: target_dispatcher
+Description: Description of target_dispatcher
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

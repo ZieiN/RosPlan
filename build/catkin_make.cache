@@ -1,0 +1,2 @@
+coord_transform:husky_position:husky_velocity:occupancy_grid:path_planner:target_dispatcher:target_follower:task_maker
+-DCATKIN_DEVEL_PREFIX=/home/vlad/husky_driver/devel -DCMAKE_INSTALL_PREFIX=/home/vlad/husky_driver/install -G Unix Makefiles

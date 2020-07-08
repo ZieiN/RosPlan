@@ -1,0 +1,8 @@
+prefix=/home/vlad/husky_driver/install
+
+Name: coord_trnsform
+Description: Description of coord_trnsform
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

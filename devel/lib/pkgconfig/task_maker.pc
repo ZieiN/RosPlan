@@ -1,0 +1,8 @@
+prefix=/home/vlad/husky_driver/devel
+
+Name: task_maker
+Description: Description of task_maker
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

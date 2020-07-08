@@ -1,0 +1,8 @@
+prefix=/home/vlad/husky_driver/install
+
+Name: target_driver
+Description: Description of target_driver
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

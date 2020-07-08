@@ -1,0 +1,8 @@
+prefix=/home/vlad/husky_driver/devel
+
+Name: occupancy_grid
+Description: Description of occupancy_grid
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
