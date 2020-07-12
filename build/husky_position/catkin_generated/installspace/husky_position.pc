@@ -1,8 +1,0 @@
-prefix=/home/vlad/husky_driver/install
-
-Name: husky_position
-Description: Description of husky_position
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
