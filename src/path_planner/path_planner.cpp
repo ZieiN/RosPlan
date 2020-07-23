@@ -17,11 +17,7 @@
 #include <coord_transform/coords.h>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-double e = 1.0;
-int chosen_one = 1;
-// EUCLID == 1
-// DIAG   == 2
-// CHEB   == 3
+
 
 
 class NODE {                                                                    //Main class
@@ -59,7 +55,7 @@ public:
 	g = predecessor.g + compute_cost(predecessor);
  }
 
- void h_calc(NODE &goal){
+ void h_calc(NODE &goal, double e, int chosen_one){
    switch (chosen_one){
       case 1:
         h = e * hypot(abs(x_coordinate - goal.x_coordinate), abs(y_coordinate - goal.y_coordinate));
@@ -127,6 +123,11 @@ struct comparator{
 
 class AStarPlanner{
 private:
+  double e = 1.0;
+  int chosen_one = 1;
+  // EUCLID == 1
+  // DIAG   == 2
+  // CHEB   == 3
   bool equivalent(NODE &one, NODE &two) {                                         //Test for two nodes being same (used for goal and start)
     if ((one.x_coordinate == two.x_coordinate)&&(one.y_coordinate == two.y_coordinate)) return true;
     else return false;
@@ -146,7 +147,7 @@ private:
           tmp.id_c(height);
           //add parent
           if(CLOSED.find(tmp.id) == CLOSED.end()) {
-            tmp.h_calc(n_goal);
+            tmp.h_calc(n_goal, e, chosen_one);
             tmp.g_calc(*current);
             tmp.f_calc();
             successors.push_back(tmp);
@@ -187,7 +188,14 @@ private:
 
 public:
   //TODO: add constructor w/ 'e' and 'chosen_one' variables:
-  //AStarPlanner()
+  AStarPlanner(double _e, int _chosen_one){
+    e = _e;
+    chosen_one = _chosen_one;
+  }
+  AStarPlanner(){
+    e = 1.0;
+    chosen_one = 1;
+  };
   geometry_msgs::PoseArray getPath(geometry_msgs::Pose start, geometry_msgs::Pose goal, nav_msgs::OccupancyGrid grid);
 };
 
@@ -329,9 +337,14 @@ Planner::Planner(ros::NodeHandle &nh){
   gridToGlobalClient = nh.serviceClient<coord_transform::coords>("grid_to_global");
   goalSub = nh.subscribe<geometry_msgs::Pose>("set_goal", 50, &Planner::setGoal, this);
   gridSub = nh.subscribe<nav_msgs::OccupancyGrid>("set_occupancy_grid", 50, &Planner::setGrid, this);
-  poseSub = nh.subscribe<geometry_msgs::Pose>("husky_pose", 50, &Planner::setStart, this);
+  poseSub = nh.subscribe<geometry_msgs::Pose>("robot_pose", 50, &Planner::setStart, this);
   actionSub = nh.subscribe<std_msgs::String>("action", 50, &Planner::action, this);
   pub = nh.advertise<geometry_msgs::PoseArray>("set_path", 50);
+  double e;
+  int chosen_one;
+  nh.param<double>("e", e, 1.0);
+  nh.param<int>("heuristic", chosen_one, 1);
+  BetterPlanner = AStarPlanner(e, chosen_one);
 }
 
 void Planner::setGoal(const geometry_msgs::Pose::ConstPtr& goalMsg){
@@ -403,6 +416,7 @@ void Planner::action(const std_msgs::String::ConstPtr& actionMsg){
   }else if (actionMsg->data == "status-planner"){
     ROS_INFO_STREAM("Current status:");
     if (planned) {
+      ROS_INFO_STREAM("Planning completed");
       ROS_INFO_STREAM("Path is:");
       for (auto point : path.poses){
         ROS_INFO_STREAM(point.position.x << "  " << point.position.y);

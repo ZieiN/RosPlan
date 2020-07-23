@@ -4,7 +4,8 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Pose
 import numpy as np
 
-path = "/home/vlad/test/1/goal.txt"
+path = rospy.get_param('~path', '/home/vlad/test/1')
+path += '/goal.txt'
 pub = rospy.Publisher('set_goal', Pose, queue_size = 1)
 goalPose = Pose()
 

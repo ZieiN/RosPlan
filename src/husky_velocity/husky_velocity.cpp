@@ -13,7 +13,7 @@ public:
 };
 
 HuskyVelocitySetter::HuskyVelocitySetter(ros::NodeHandle &nh){
-  velSub = nh.subscribe<geometry_msgs::Twist>("set_model_velocity", 50, &HuskyVelocitySetter::setVelocity, this);//TODO
+  velSub = nh.subscribe<geometry_msgs::Twist>("set_model_velocity", 50, &HuskyVelocitySetter::setVelocity, this);
   velPub = nh.advertise<geometry_msgs::Twist>("husky_velocity_controller/cmd_vel", 50);
 }
 

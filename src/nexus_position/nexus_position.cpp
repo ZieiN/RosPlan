@@ -5,22 +5,22 @@
 
 const std::string NexusModelName = "turtlebot3_waffle";
 
-class NexusPathGetter{
+class NexusPoseGetter{
 private:
     ros::Subscriber poseSub;
     ros::Publisher  posePub;
     geometry_msgs::Pose poseNexus;
 public:
-    NexusPathGetter(ros::NodeHandle &nh);
-    void getPath(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
+    NexusPoseGetter(ros::NodeHandle &nh);
+    void getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
 };
 
-NexusPathGetter::NexusPathGetter(ros::NodeHandle &nh){
-  poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &NexusPathGetter::getPath, this);
+NexusPoseGetter::NexusPoseGetter(ros::NodeHandle &nh){
+  poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &NexusPoseGetter::getPose, this);
   posePub = nh.advertise<geometry_msgs::Pose>("robot_pose", 50);
 }
 
-void NexusPathGetter::getPath(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){
+void NexusPoseGetter::getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){
   int i = 0;
   for (auto modelName : statesMsg->name){
     if (modelName == NexusModelName) break;
@@ -34,7 +34,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "nexus_position");
   ros::NodeHandle nh;
 
-  NexusPathGetter getter = NexusPathGetter(nh);
+  NexusPoseGetter getter = NexusPoseGetter(nh);
 
   ros::Rate rate = ros::Rate(50);
 

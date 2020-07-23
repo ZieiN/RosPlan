@@ -4,7 +4,9 @@ from std_msgs.msg import String
 from nav_msgs.msg import OccupancyGrid
 import numpy as np
 
-path = "/home/vlad/test/1/grid.txt"
+path = rospy.get_param('~path', '/home/vlad/test/1')
+path += '/grid.txt'
+
 grid = OccupancyGrid()
 pub = rospy.Publisher('set_occupancy_grid', OccupancyGrid, queue_size = 5)
 
@@ -17,8 +19,8 @@ def MapCreator():
 
 def callback(action):
     if action.data == 'read-grid' or action.data == 'load data':
-        read_grid()
         rospy.loginfo_once("reading grid")
+        read_grid()
     elif action.data == 'set-grid' or action.data == 'set data':
         pub.publish(grid)
         rospy.loginfo_once("publishing grid")

@@ -61,7 +61,7 @@ public:
 Driver::Driver(ros::NodeHandle& nh){
   pub = nh.advertise<geometry_msgs::Twist>("set_model_velocity", 50);
   arv = nh.advertise<std_msgs::Bool>("arrival", 50);
-  pos = nh.subscribe<geometry_msgs::Pose>("husky_pose", 50, &Driver::set_pose, this);
+  pos = nh.subscribe<geometry_msgs::Pose>("robot_pose", 50, &Driver::set_pose, this);
   trg = nh.subscribe<geometry_msgs::Pose>("set_target", 50, &Driver::set_target, this);
   act = nh.subscribe<std_msgs::String>("action", 50, &Driver::action, this);
   arrival.data = true;

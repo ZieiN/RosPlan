@@ -5,22 +5,22 @@
 
 const std::string HuskyModelName = "husky";
 
-class HuskyPathGetter{
+class HuskyPoseGetter{
 private:
     ros::Subscriber poseSub;
     ros::Publisher  posePub;
     geometry_msgs::Pose poseHusky;
 public:
-    HuskyPathGetter(ros::NodeHandle &nh);
-    void getPath(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
+    HuskyPoseGetter(ros::NodeHandle &nh);
+    void getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
 };
 
-HuskyPathGetter::HuskyPathGetter(ros::NodeHandle &nh){
-  poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &HuskyPathGetter::getPath, this);
-  posePub = nh.advertise<geometry_msgs::Pose>("husky_pose", 50);
+HuskyPoseGetter::HuskyPoseGetter(ros::NodeHandle &nh){
+  poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &HuskyPoseGetter::getPose, this);
+  posePub = nh.advertise<geometry_msgs::Pose>("robot_pose", 50);
 }
 
-void HuskyPathGetter::getPath(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){
+void HuskyPoseGetter::getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){
   int i = 0;
   for (auto modelName : statesMsg->name){
     if (modelName == HuskyModelName) break;
@@ -34,7 +34,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "husky_position");
   ros::NodeHandle nh;
 
-  HuskyPathGetter getter = HuskyPathGetter(nh);
+  HuskyPoseGetter getter = HuskyPoseGetter(nh);
 
   ros::Rate rate = ros::Rate(50);
 
