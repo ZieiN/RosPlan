@@ -18,12 +18,16 @@ def MapCreator():
     rospy.spin()
 
 def callback(action):
-    if action.data == 'read-grid' or action.data == 'load data':
+    if action.data == 'read-grid' or action.data == 'read-data':
         rospy.loginfo_once("reading grid")
         read_grid()
-    elif action.data == 'set-grid' or action.data == 'set data':
-        pub.publish(grid)
+    elif action.data == 'set-grid' or action.data == 'set-data':
+        pub.publish(grid);
         rospy.loginfo_once("publishing grid")
+    elif action.data == 'load-data':
+        rospy.loginfo_once("Reading and publishing grid")
+        read_grid()
+        pub.publish(grid)
 
 def read_grid():
     with open(path) as mapData:

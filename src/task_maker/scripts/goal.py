@@ -15,12 +15,16 @@ def setGoal():
 
     rospy.spin()
 def callback(action):
-    if action.data == "read-goal" or action.data == 'load data':
+    if action.data == "read-goal" or action.data == 'read-data':
         read_goal()
         rospy.loginfo_once("reading goal")
-    elif action.data == "set-goal" or action.data == 'set data':
+    elif action.data == "set-goal" or action.data == 'set-data':
         pub.publish(goalPose)
         rospy.loginfo_once("publishing goal")
+    elif action.data == 'load-data':
+        rospy.loginfo_once("Reading and publishing goal")
+        read_goal()
+        pub.publish(goalPose)
 
 def read_goal():
     with open(path) as goalData:
