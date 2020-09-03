@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="data_folder" default="$(find path_planner)/../../examples"/>
+  <arg name="world_name" default="grid"/>
+  <arg name="hweight" default = "1"/>
+  <arg name="heuristic" default = "1" /><!-- change to word tags -->
+
+  <arg name="robot_amount" default="3"/>
+  <arg name="laser_enabled" default="false"/>
+  <arg name="ur5_enabled" default="false"/>
+  <arg name="kinect_enabled" default="false"/>
+
+  <include file="$(find multimaster_launch)/launch/multimaster_gazebo.launch"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg data_folder)/$(arg world_name).world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="verbose" value="true"/>
+  </include>
+
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_1"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="model_name" value="husky_1"/>
+  </include>
+  <group ns="husky_1">
+    <node name="target_dispatcher" pkg="target_dispatcher" type="target_dispatcher"  output="screen"/>
+    <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
+  </group>
+
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 1)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_2"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="3.0"/>
+    <arg name="model_name" value="husky_2"/>
+  </include>
+  <group ns="husky_2" if="$(eval arg('robot_amount') > 1)">
+    <node name="target_dispatcher" pkg="target_dispatcher" type="target_dispatcher"  output="screen"/>
+    <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
+  </group>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 2)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_3"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="6.0"/>
+    <arg name="model_name" value="husky_3"/>
+  </include>
+  <group ns="husky_3" if="$(eval arg('robot_amount') > 2)">
+    <node name="target_dispatcher" pkg="target_dispatcher" type="target_dispatcher"  output="screen"/>
+    <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
+  </group>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 3)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_4"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="9.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 4)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_5"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="12.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 5)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_6"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="15.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 6)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_7"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="18.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 7)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_8"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="21.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 8)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_9"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="24.0"/>
+  </include>
+
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch" if="$(eval arg('robot_amount') > 9)">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+    <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
+    <arg name="robot_namespace" value="husky_10"/>
+    <arg name="multimaster" value="true"/>
+    <arg name="y" value="27.0"/>
+  </include>
+
+
+
+</launch>
