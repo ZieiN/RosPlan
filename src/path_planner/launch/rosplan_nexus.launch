@@ -1,37 +1,35 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="data_folder" default="$(find path_planner)/../../examples/"/>
-  <arg name="world_name" default="occupancy_map"/>
-
-
-
-
+  <arg name="data_folder" default="$(find path_planner)/../../examples"/>
+  <arg name="world_name" default="grid"/>
   <arg name="hweight" default = "1"/>
   <arg name="heuristic" default = "1" /><!-- change to word tags -->
+  <arg name="model_name" default="turtlebot3_waffle"/>
+
 
 
   <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch">
     <arg name="world_name" value="$(arg data_folder)/$(arg world_name).world"/>
   </include>
 
+  <param name="data_folder" type="string" value="$(arg data_folder)"/>
+  <param name="hweight" value="$(arg hweight)"/>
+  <param name="heuristic" value="$(arg heuristic)"/>
+  <param name="model_name" value="$(arg model_name)"/>
 
-
-  <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
+  <!-- core nodes -->tur
+  <node name="path_planner" pkg="path_planner" type="path_planner" output="screen"/>
   <node name="target_dispatcher" pkg="target_dispatcher" type="target_dispatcher"  output="screen"/>
-  <node name="path_planner" pkg="path_planner" type="path_planner" output="screen">
-    <param name="e" value="$(arg hweight)"/>
-    <param name="heuristic" value="$(arg heuristic)"/>
-  </node>
-
+  <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
+  <!-- husky bridges -->
   <node name="nexus_position" pkg="nexus_position" type="nexus_position"  output="screen" />
   <node name="nexus_velocity" pkg="nexus_velocity" type="nexus_velocity"  output="screen" />
-
+  <!-- coord transforming services -->
   <node name="grid_to_global" pkg="coord_transform" type="grid_to_global"  output="screen"/>
   <node name="global_to_grid" pkg="coord_transform" type="global_to_grid"  output="screen"/>
-  <node name="occupancy_grid" pkg="occupancy_grid" type="create_grid.py"  output="screen">
-   <param name="path" value="$(arg data_folder)"/>
-  </node>
-  <node name="goal" pkg="task_maker" type="goal.py"  output="screen">
-   <param name="path" value="$(arg data_folder)"/>
-  </node>
+  <!-- data loaders -->
+  <node name="occupancy_grid" pkg="occupancy_grid" type="create_grid.py"  output="screen"/>
+  <node name="goal" pkg="task_maker" type="goal.py"  output="screen"/>
+
+
 </launch>

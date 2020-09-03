@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="data_folder" default="$(find path_planner)/../../examples/"/>
-	<arg name="occupancy_grid_name" default="occupancy_map"/>
+    <arg name="data_folder" default="$(find path_planner)/../../examples"/>
 
+	<arg name="occupancy_grid_name" default="grid"/>
+    <arg name="gazebo_world_name" default="occupancy_map.world"/>
 
 
   <include file="$(find octomap_to_gazebo)/launch/generate_world_and_contours.launch">
-	<arg name="data folder" value="$(arg data_folder)"/>
+	<arg name="data_folder" value="$(arg data_folder)"/>
     <arg name="occupancy_grid_name" value="$(arg occupancy_grid_name)"/>
+    <arg name="gazebo_world_name" value="$(arg gazebo_world_name)"/>
   </include>
 
 
