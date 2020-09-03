@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="data_folder" default="$(find path_planner)/../../examples"/>
+    <arg name = "occupancy_grid_name" default = "grid" />
+
+
+    <param name="occupancy_grid_name" type="string" value="$(arg data_folder)/$(arg occupancy_grid_name)"/>
+    <param name="data_folder" type="string" value="$(arg data_folder)"/>
+    <node name="generate_height_map" pkg="octomap_to_gazebo" type="createHeightMap.py" output="screen" />
+</launch>

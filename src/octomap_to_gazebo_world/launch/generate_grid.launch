@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+	<arg name="data_folder" default="$(find path_planner)/../../examples"/>
+    <arg name = "occupancy_grid_name" default = "grid" />
+
+        <param name="occupancy_grid_name" type="string" value="$(arg occupancy_grid_name)"/>
+        <param name="data_folder" type="string" value="$(arg data_folder)"/>
+    <node name="Image_converter" pkg="octomap_to_gazebo" type="Image_converter.py" output="screen" />
+</launch>
