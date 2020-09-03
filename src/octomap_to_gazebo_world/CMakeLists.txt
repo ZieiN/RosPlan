@@ -18,6 +18,8 @@ catkin_package(
 catkin_install_python(PROGRAMS
     python_scripts/generate_world_and_contours.py
     python_scripts/createGazeboWorld.py
+    python_scripts/Image_converter.py
+    python_scripts/createHeightMap.py
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

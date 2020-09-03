@@ -97,7 +97,7 @@ def getDirection(x1, x2, y1, y2):
 #     return abs(x2 - x1)
 
 
-def writeWall(point_1, point_2, i, scale, gazebo_file):
+def writeWall(point_1, point_2, origin, i, scale, gazebo_file):
     s = Template("""<model name='Wall_$index'>
      <static>1</static>
     <link name='Wall_$index'>
@@ -119,7 +119,7 @@ def writeWall(point_1, point_2, i, scale, gazebo_file):
         <material>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Red</name>
           </script>
         </material>
       </visual>
@@ -131,46 +131,39 @@ def writeWall(point_1, point_2, i, scale, gazebo_file):
     </link>
      </model>""")
     # we deleted scale
-    x1 = point_1[0] * scale
-    y1 = point_1[1] * scale
+    x1 = point_1[0] * scale + origin[0]
 
-    x2 = point_2[0] * scale
-    y2 = (point_2[1] + 1) * scale
+    y1 = point_1[1] * scale + origin[1]
+
+    x2 = point_2[0] * scale + origin[0]
+
+    y2 = (point_2[1] + 1) * scale + origin[1]
 
     mid_x = midpoint(x1, x2) + 0.5 * scale
     mid_y = midpoint(y1, y2)
 
     cnt_direction = getDirection(x1, x2, y1, y2)
-    print("cnt_direction", cnt_direction)
+    #print("cnt_direction", cnt_direction)
     #cnt_length = sqrt((x1 - x2)**2 + (y1 - y2)**2)
     cnt_length = abs(y1 - y2)
-    print("cnt_length", cnt_length)
+    #print("cnt_length", cnt_length)
     #cnt_length = func_length(x1, x2)
     # print("x1 = $f, y1 = $f, y2= $f, x2 = %f", x1, y1, x2, y2)
     # length + 1
     wall_string = s.substitute(index=i, length=cnt_length,
                                width=1 * scale, height=2.5,
                                x_mid=mid_x, y_mid=mid_y,
-#                               direction=cnt_direction)
+                               #                               direction=cnt_direction)
                                direction=cnt_direction)
     gazebo_file.write(wall_string)
 
 
-def writeWallToWorld(list_origin_walls, list_final_walls, scale, gazebo_file, wall_num):
+def writeWallToWorld(list_origin_walls, list_final_walls, origin, scale, gazebo_file, wall_num):
     for i in range(len(list_origin_walls)):
-        writeWall(list_origin_walls[i], list_final_walls[i], wall_num, scale, gazebo_file)
+        writeWall(list_origin_walls[i], list_final_walls[i], origin, wall_num, scale, gazebo_file)
         #writeWall(point_1, point_2, i, scale, gazebo_file)
         wall_num += 1
     return wall_num
-
-
-def writeContourToWorldFile(contour, scale, gazebo_file, wall_num):
-    for i in range(len(contour)):
-        writeWall(contour[i-1], contour[i], wall_num, scale, gazebo_file)
-        wall_num += 1
-
-    return wall_num
-
 
 def closeWorldFile(gazebo_file):
     s = """</world>
