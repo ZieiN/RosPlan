@@ -204,7 +204,23 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+set(HEADERS        	src/Path.h
+					src/Map.h
+					src/Node.h
+					src/A_search.h
+					src/Open.h
+					src/Closed.h)
 
-add_executable(path_planner path_planner.cpp)
+set(SOURCES 		src/Path.cpp
+					src/Map.cpp
+					src/Node.cpp
+					src/A_search.cpp
+					src/Open.cpp
+					src/Closed.cpp)
+
+add_executable(path_planner src/path_planner.cpp
+							src/path_planner_new.cpp
+							${HEADERS}
+							${SOURCES})
 add_dependencies(path_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(path_planner ${catkin_LIBRARIES})
