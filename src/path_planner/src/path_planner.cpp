@@ -15,6 +15,8 @@
 #include <iostream>
 #include <ros/console.h>
 #include <coord_transform/coords.h>
+
+//#include "A_search.h"
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +213,7 @@ geometry_msgs::PoseArray AStarPlanner::getPath(geometry_msgs::Pose start, geomet
   int b;
   for (int i = 0; i < grid.info.height; ++i){
     for(int j = 0; j < grid.info.width; ++j){
-      b = grid.data[j*grid.info.height + i];
+      b = grid.data[i*grid.info.height + j];
       map[i][j] = bool(b == 100 ? 1: 0);
     }
   }
@@ -342,8 +344,8 @@ Planner::Planner(ros::NodeHandle &nh){
   pub = nh.advertise<geometry_msgs::PoseArray>("set_path", 50);
   double e;
   int chosen_one;
-  nh.param<double>("e", e, 1.0);
-  nh.param<int>("heuristic", chosen_one, 1);
+  nh.param<double>("hweight", e, 1.0);
+  nh.param<int>("metricType", chosen_one, 1);
   BetterPlanner = AStarPlanner(e, chosen_one);
 }
 
@@ -357,6 +359,7 @@ void Planner::setGoal(const geometry_msgs::Pose::ConstPtr& goalMsg){
     goal = crd.response.output;
     goalIsSet = true;
     ROS_INFO_STREAM("Goal was received by path_planner");
+    ROS_INFO_STREAM("Goal in grid coordinates: " << goal.position.x << " " << goal.position.y);
   }else ROS_WARN_STREAM("Cannot transform goal point coordinates into grid system. Send grid info first");
 }
 
