@@ -7,12 +7,12 @@
 req.input.position  - coordinates in grid system
 req.info            - grid info (resolution, origin)
 
-res.output          - coordinates in global system
+res.output.position - coordinates in global system
 */
 bool transform(coord_transform::coords::Request  &req,
               coord_transform::coords::Response &res){
-  res.output.position.x = req.info.resolution*req.input.position.x + req.info.origin.position.x;
-  res.output.position.y = req.info.origin.position.y - req.info.resolution*req.input.position.y;
+  res.output.position.x = req.info.origin.position.x + req.info.resolution*req.input.position.x;
+  res.output.position.y = req.info.origin.position.y + req.info.resolution*req.input.position.y;
   res.output.position.z = 0;
   return true;
 }
