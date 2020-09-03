@@ -81,13 +81,17 @@ void Driver::set_target(const geometry_msgs::Pose::ConstPtr& targetMsg){
 void Driver::action(const std_msgs::String::ConstPtr& actionMsg){
   if (actionMsg->data == "status-driver"){
     ROS_INFO_STREAM("Driver status:");
-    if (driving == true){
+    if (driving){
       ROS_INFO_STREAM("DRIVING");
       ROS_INFO_STREAM("Next target is:" << target.first << " " << target.second);
     }
-    else{
-      ROS_INFO_STREAM("STAND BY");
+    else {
+        ROS_INFO_STREAM("STAND BY");
     }
+  }else if(actionMsg->data == "start"){
+      arrival.data = false;
+      driving = true;
+      arv.publish(arrival);
   }else if (actionMsg->data == "pause"){
     driving = false;
     ROS_INFO_STREAM("Pausing");
@@ -122,7 +126,7 @@ void Driver::calc_distance(){
 }
 
 void Driver::calc_thetta(){
-  ROS_INFO_STREAM("direction angle = " << acos(direction[0]/distance)*direction[1]/abs(direction[1]) << " robot angle = " << 2*asin(robot_pose.orientation.z));
+  //ROS_INFO_STREAM("direction angle = " << acos(direction[0]/distance)*direction[1]/abs(direction[1]) << " robot angle = " << 2*asin(robot_pose.orientation.z));
   double direction_angle = acos(direction[0]/distance)*direction[1]/abs(direction[1]);
   double robot_angle = acos(robot_pose.orientation.w*robot_pose.orientation.w - robot_pose.orientation.z*robot_pose.orientation.z);
   robot_angle =  (robot_pose.orientation.z*robot_pose.orientation.w > 0 ? 1: -1)*robot_angle;
@@ -139,41 +143,9 @@ void Driver::define_speed(){
   signed_distance = (abs(delta_thetta) < PI_NUM ? distance : -distance);
   //std::cout << direction[0] << "   " << direction[1] << "   " << delta_thetta << std::endl;
   //Сначала доворачиваемся на нужный угол
-  //делаем это циклом while с моментом времени из chrono
-  //если довернулись - продолжаем движение
-  /*
-  if(distance > 0.2){
-    if(abs(delta_thetta) > 0.05){
-      linearPid.reset();
-      spd.linear.x = 0;
-      spd.angular.z = -angularPid.calculate(0, delta_thetta);
-    }else{
-      angularPid.reset();
-      spd.linear.x  = -linearPid.calculate(0, signed_distance);
-      spd.angular.z = 0;
-    }
-  }else{
-    angularPid.reset();
-    linearPid.reset();
-    arrival.data = true;
-    arv.publish(arrival);
-    driving = false;
-    spd.angular.z = .0;
-    spd.linear.x = .0;
-  }
-  */
-  /*
-  if(distance > 0.2){
-    spd.linear.x  = MAX_LINEAR_SPEED * tanh(distance * cos(delta_thetta));
-    spd.angular.z = 0.5 * delta_thetta + MAX_LINEAR_SPEED*tanh(distance)*sin(2*delta_thetta) / (2*distance);
-  }else{
-    arrival.data = true;
-    driving = false;
-    spd.angular.z = .0;
-    spd.linear.x = .0;
-  }
-  pub.publish(spd);
-  */
+  //если довернулись - движемся прямо к цели
+  //если сбились с курса - доворачиваемся на хожу
+
 
   if(distance > 0.2){
     if(abs(delta_thetta) > 0.2){
@@ -189,13 +161,14 @@ void Driver::define_speed(){
     spd.angular.z = .0;
     spd.linear.x = .0;
   }
+  ROS_INFO_STREAM("target is: "<< target.first << " " << target.second);
   ROS_INFO_STREAM("distance: "<< distance << "; " << "thetta: " << delta_thetta);
   pub.publish(spd);
 
 }
 
 void Driver::drive(){
-  arv.publish(arrival);
+  if (arrival.data) {arv.publish(arrival); arrival.data = false;}
   if (driving) define_speed();
 }
 

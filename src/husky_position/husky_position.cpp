@@ -3,13 +3,13 @@
 #include <gazebo_msgs/ModelStates.h>
 #include <stdlib.h>
 
-const std::string HuskyModelName = "husky";
 
 class HuskyPoseGetter{
 private:
     ros::Subscriber poseSub;
     ros::Publisher  posePub;
     geometry_msgs::Pose poseHusky;
+    std::string HuskyModelName;
 public:
     HuskyPoseGetter(ros::NodeHandle &nh);
     void getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
@@ -18,6 +18,7 @@ public:
 HuskyPoseGetter::HuskyPoseGetter(ros::NodeHandle &nh){
   poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &HuskyPoseGetter::getPose, this);
   posePub = nh.advertise<geometry_msgs::Pose>("robot_pose", 50);
+  nh.getParam("model_name", HuskyModelName);
 }
 
 void HuskyPoseGetter::getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){

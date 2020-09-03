@@ -3,13 +3,13 @@
 #include <gazebo_msgs/ModelStates.h>
 #include <stdlib.h>
 
-const std::string NexusModelName = "turtlebot3_waffle";
 
 class NexusPoseGetter{
 private:
     ros::Subscriber poseSub;
     ros::Publisher  posePub;
     geometry_msgs::Pose poseNexus;
+    std::string NexusModelName;
 public:
     NexusPoseGetter(ros::NodeHandle &nh);
     void getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg);
@@ -18,6 +18,7 @@ public:
 NexusPoseGetter::NexusPoseGetter(ros::NodeHandle &nh){
   poseSub = nh.subscribe<gazebo_msgs::ModelStates>("gazebo/model_states", 50, &NexusPoseGetter::getPose, this);
   posePub = nh.advertise<geometry_msgs::Pose>("robot_pose", 50);
+  nh.getParam("model_name", NexusModelName);
 }
 
 void NexusPoseGetter::getPose(const gazebo_msgs::ModelStates::ConstPtr& statesMsg){
