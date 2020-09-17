@@ -20,6 +20,7 @@ def callback(action):
     if action.data == 'read-grid' or action.data == 'read-data':
         rospy.loginfo_once("reading grid")
         read_grid()
+        transform_grid()
     elif action.data == 'set-grid' or action.data == 'set-data':
         pub.publish(grid)
         rospy.loginfo_once("publishing grid")
@@ -27,12 +28,15 @@ def callback(action):
         rospy.loginfo_once("Reading and publishing grid")
         read_grid()
         pub.publish(grid)
+    elif action.data == 'test':
+        transform_grid()
+        print(grid.data)
 
 
 def read_grid():
     with open(path) as mapData:
-        grid.info.width = np.uint32(mapData.readline())
         grid.info.height = np.uint32(mapData.readline())
+        grid.info.width = np.uint32(mapData.readline())
         grid.info.resolution = np.float32(mapData.readline())
         grid.info.origin.position.x = np.float64(mapData.readline())
         grid.info.origin.position.y = np.float64(mapData.readline())
@@ -44,6 +48,23 @@ def read_grid():
                 break
             data.append(np.int8(c))
         grid.data = data
+
+
+def transform_grid():
+    grid.info.height += 2
+    grid.info.width += 2
+    grid.info.origin.position.x -= grid.info.resolution
+    grid.info.origin.position.y -= grid.info.resolution
+    new_data = []
+    for i in range(grid.info.width):
+        for j in range(grid.info.height):
+            if i == 0 or j == 0 or i == grid.info.height-1 or j == grid.info.width-1:
+                new_data.append(100)
+            else:
+                #print(grid.data[(j-1)*(grid.info.height-2)+(i-1)])
+                new_data.append(grid.data[(i-1)*(grid.info.height-2)+(j-1)])
+    grid.data = new_data
+
 
 
 if __name__ == '__main__':
