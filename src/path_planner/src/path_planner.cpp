@@ -280,7 +280,7 @@ geometry_msgs::PoseArray AStarPlanner::getPath(geometry_msgs::Pose start, geomet
     }
   }
   //ROS_INFO_STREAM("Successfully ended path constructing!");
-  geometry_msgs::PoseArray path;
+  geometry_msgs::PoseArray lppath;
   geometry_msgs::Pose point;
   int range = PATH.size();
   //ROS_INFO_STREAM("Successfully started path extracting");
@@ -290,9 +290,57 @@ geometry_msgs::PoseArray AStarPlanner::getPath(geometry_msgs::Pose start, geomet
     point.position.y = PATH.top().y_coordinate;
     PATH.pop();
     ROS_INFO_STREAM(point.position.x << "  " << point.position.y);
-    path.poses.push_back(point);
+    lppath.poses.push_back(point);
   }
-  return path;
+  geometry_msgs::PoseArray hppath;
+  int prev_direction, direction = -1;          //0 - north, 1 - north-east, 2 - east, 3 - south-east, etc.
+  int dx, dy;
+  for (int n = 0; n < lppath.poses.size()-1; ++n){
+    dx = lppath.poses[n+1].position.x - lppath.poses[n].position.x;
+    dy = lppath.poses[n+1].position.y - lppath.poses[n].position.y;
+    if(dx == 1){
+        if(dy == 1){
+            direction = 3;
+        }else if (dy == -1){
+            direction = 5;
+        }else{
+            direction = 4;
+        }
+    }else if (dx == -1){
+        if(dy == 1){
+            direction = 1;
+        }else if (dy == -1){
+            direction = 7;
+        }else{
+            direction = 0;
+        }
+    }else{
+        if(dy == 1){
+            direction = 2;
+        }else if (dy == -1){
+            direction = 6;
+        }else{
+            direction = -1;
+        }
+    }
+
+    if(prev_direction == -1){
+        continue;
+    }else if(direction == -1){
+        std::cout << "Error occurred: could not find hppath!\n";
+        break;
+    }else{
+        if(direction == prev_direction){
+            continue;
+        }else{
+            hppath.poses.push_back(lppath.poses[n]);
+        }
+    }
+    prev_direction = direction;
+
+    }
+    hppath.poses.push_back(lppath.poses.back());
+  return hppath;
   ROS_INFO_STREAM("Successfully ended path extracting");
 }
 
@@ -326,8 +374,7 @@ public:
   Planner(ros::NodeHandle &nh);
 
 
-  //These two functions allow user to get either hardcoded pre-written path, or path via A* planner
-  geometry_msgs::PoseArray getHardcodedPath();
+  //These function allow user to get path via A* planner
   geometry_msgs::PoseArray getAStarPath();
 
   //This function publish created path to the publisher
@@ -358,6 +405,7 @@ void Planner::setGoal(const geometry_msgs::Pose::ConstPtr& goalMsg){
     globalToGridClient.call(crd);
     goal = crd.response.output;
     goalIsSet = true;
+    ROS_INFO_STREAM(crd.request << crd.response);
     ROS_INFO_STREAM("Goal was received by path_planner");
     ROS_INFO_STREAM("Goal in grid coordinates: " << goal.position.x << " " << goal.position.y);
   }else ROS_WARN_STREAM("Cannot transform goal point coordinates into grid system. Send grid info first");
@@ -366,7 +414,7 @@ void Planner::setGoal(const geometry_msgs::Pose::ConstPtr& goalMsg){
 void Planner::setGrid(const nav_msgs::OccupancyGrid::ConstPtr& gridMsg){
   grid = *gridMsg;
   gridIsSet = true;
-  ROS_INFO_STREAM("Grid was received by path_planner");
+  ROS_INFO_STREAM("Grid was received by path_planner"); //todo: add robot number; (for example): "Grid was received by tb3_0 path_planner"
 }
 
 bool Planner::checkTask(){
@@ -409,9 +457,7 @@ void Planner::setStart(const geometry_msgs::Pose::ConstPtr& HuskyPoseMsg){
 }
 
 void Planner::action(const std_msgs::String::ConstPtr& actionMsg){
-  if (actionMsg->data == "find-path-hc"){
-    path = getHardcodedPath();
-  }else if (actionMsg->data == "find-path-astar"){
+  if (actionMsg->data == "find-path-astar"){
     if (checkTask()) path = getAStarPath();
     else ROS_ERROR_STREAM("Path planning error. Stopping");
   }else if (actionMsg->data == "get-path"){
@@ -428,28 +474,10 @@ void Planner::action(const std_msgs::String::ConstPtr& actionMsg){
     if (goalIsSet){
       ROS_INFO_STREAM("Goal is " << goal.position.x << " " << goal.position.y << " in grid coordinates");
       //ROS_INFO_STREAM("Goal is " << SIZE_CELL*goal.position.x  - SIZE_CELL << " " << SIZE_CELL - SIZE_CELL*goal.position.y << " in global coordinates");
-    } else ROS_INFO_STREAM("No goal has been choosed yet");
+    } else ROS_INFO_STREAM("No goal has been chosen yet");
   }
 }
 
-geometry_msgs::PoseArray Planner::getHardcodedPath(){
-  geometry_msgs::PoseArray path;
-  geometry_msgs::Pose point;
-
-  point.position.x = 3.0;
-  point.position.y = 1.0;
-  path.poses.push_back(point);
-  point.position.x = 3.0;
-  point.position.y = 2.0;
-  path.poses.push_back(point);
-  point.position.x = 3.0;
-  point.position.y = 3.0;
-  path.poses.push_back(point);
-
-
-  planned = true;
-  return path;
-}
 
 geometry_msgs::PoseArray Planner::getAStarPath(){
   planned = true;//но это может быть не так!
