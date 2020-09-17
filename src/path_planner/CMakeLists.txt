@@ -219,7 +219,7 @@ set(SOURCES 		src/Path.cpp
 					src/Closed.cpp)
 
 add_executable(path_planner src/path_planner.cpp
-							src/path_planner_new.cpp
+		#					src/path_planner_new.cpp
 							${HEADERS}
 							${SOURCES})
 add_dependencies(path_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

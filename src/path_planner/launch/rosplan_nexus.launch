@@ -14,10 +14,10 @@
 
   <param name="data_folder" type="string" value="$(arg data_folder)"/>
   <param name="hweight" value="$(arg hweight)"/>
-  <param name="heuristic" value="$(arg heuristic)"/>
+  <param name="metricType" value="$(arg heuristic)"/>
   <param name="model_name" value="$(arg model_name)"/>
 
-  <!-- core nodes -->tur
+  <!-- core nodes -->
   <node name="path_planner" pkg="path_planner" type="path_planner" output="screen"/>
   <node name="target_dispatcher" pkg="target_dispatcher" type="target_dispatcher"  output="screen"/>
   <node name="target_follower" pkg="target_follower" type="target_follower"  output="screen"/>
