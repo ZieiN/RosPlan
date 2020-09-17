@@ -30,6 +30,7 @@ def generateGrid(data_folder, name):
     print(m)
     m = m * 100
     print(m[::, ::, 1])
+
     #and then write it to txt file
     f = open(data_folder + '/' + name + '.txt', 'w')
     f.write(str(m.shape[0]) + '\n' + str(m.shape[1]) + '\n')

@@ -33,8 +33,8 @@ def get_walls(name):
 
     file.close()
 
-    origin.append(origin_x - scale * 0.5)
-    origin.append(origin_y - scale * 0.5)
+    origin.append(origin_x - scale*0.5)
+    origin.append(origin_y - scale*0.5)
     origin.append(origin_z)
 
     occupancy_grid = np.zeros((h, w), dtype=np.int8)
@@ -84,8 +84,7 @@ if __name__ == '__main__':
         configs = yaml.load(f)
 
     # scale = configs["resolution"]
-    map_name = configs["image"]
-    occupancy_grid_file = os.path.dirname(occupancy_grid_yaml) + '/' + map_name
+    # occupancy_grid_file = os.path.dirname(occupancy_grid_yaml) + '/' + map_name
 
     # output_contour_filename = rospy.get_param("contour_file")
     output_gazebo_filename = rospy.get_param("gazebo_world_file")
