@@ -211,9 +211,25 @@ include_directories(
 
 #set(SOURCES
 #        )
+set(HEADERS        	src/astar/Path.h
+        src/astar/Map.h
+        src/astar/Node.h
+        src/astar/A_search.h
+        src/astar/Open.h
+        src/astar/Closed.h)
 
-add_executable(planner_cmc src/planner_sb.cpp
-                            src/planner.cpp)
+set(SOURCES 		src/astar/Path.cpp
+        src/astar/Map.cpp
+        src/astar/Node.cpp
+        src/astar/A_search.cpp
+        src/astar/Open.cpp
+        src/astar/Closed.cpp)
+add_executable(planner_cmc
+#                            src/planner_sb.cpp
+                            ${HEADERS}
+                            ${SOURCES}
+                            src/planner_node.cpp
+                )
 #        ${HEADERS}
 #        ${SOURCES})
 add_dependencies(planner_cmc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
