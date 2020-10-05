@@ -95,7 +95,7 @@ public:
         transformPointToGrid(this->start);
     }
     void transformPointToGrid(geometry_msgs::Point& point); //move this to tools.h
-    void transformPointToGoal(geometry_msgs::Point& point); //move this to tools.h
+    void transformPointToGlobal(geometry_msgs::Point& point); //move this to tools.h
     void transformPathToGlobal();
     void publish();
 };
@@ -152,7 +152,7 @@ void Planner::transformPointToGrid(geometry_msgs::Point& point) {
     point.x += 299;
     point.y += 299;
 }
-void Planner::transformPointToGoal(geometry_msgs::Point& point) {
+void Planner::transformPointToGlobal(geometry_msgs::Point& point) {
     point.x -= 299;
     point.y -= 299;
 
