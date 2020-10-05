@@ -30,14 +30,13 @@ void search(nav_msgs::OccupancyGrid &grid, geometry_msgs::Point& startPoint, geo
     ROS_INFO_STREAM("starting");
     A_search seeker = A_search(1.0, euclidean, true, true, true, true);
     Map occupancyMap = Map(grid);
-    rtp_msgs::PathStamped pathMsg;
     Node start(startPoint.x, startPoint.y, grid.info.height*startPoint.y + startPoint.x);
     Node goal(goalPoint.x, goalPoint.y, grid.info.height*goalPoint.y + goalPoint.x);
     seeker.search(start, goal, occupancyMap);
-    seeker.create_path(startPoint, pathMsg);
+    seeker.create_path(startPoint, path);
     seeker.clear();
     ROS_INFO_STREAM("end of planning");
-    ROS_INFO_STREAM(pathMsg);
+    ROS_INFO_STREAM(path);
 }
 
 
