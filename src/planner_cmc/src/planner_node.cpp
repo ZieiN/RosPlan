@@ -62,7 +62,8 @@ private:
     nav_msgs::OccupancyGrid         grid;
     geometry_msgs::PointStamped     goal;
     rtp_msgs::PathStamped           path;
-    geometry_msgs::PoseWithCovarianceStamped    start;
+    // I changed start to normal point for easier work when searching for path.
+    geometry_msgs::Point            start;
     geometry_msgs::PoseWithCovariance           huskyPose;
     geometry_msgs::TransformStamped             isns_link;
 public:
@@ -81,24 +82,27 @@ public:
         this->goal = *goalMsg;
         transformPointToGrid(this->goal.point);
         this->goal.header.frame_id = "local_map";
+        ROS_INFO_STREAM(start);
         ROS_INFO_STREAM(goal.point);
-        search(grid, start.pose.pose.position, goal.point, path);
-    }
-    void setStart(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& startMsg){
-        this->start = *startMsg;
-        transformPointToGrid(this->start.pose.pose.position);
-        ROS_INFO_STREAM(start.pose.pose.position);
-        this->start.header.frame_id = "local_map";
+        search(grid, start, goal.point, path);
+        transformPathToGlobal();
+        // This must be changed to publish every time we receive /occupancy/accumulated. I let it here now, because there are some functions don't work with empty paths.
+        trajectoryPublisher.publish(path);
     }
     void setRobotPose(const nav_msgs::Odometry::ConstPtr& odometryMsg){
         this->huskyPose = odometryMsg->pose;
+        this->start = huskyPose.pose.position;
+        transformPointToGrid(this->start);
     }
     void transformPointToGrid(geometry_msgs::Point& point); //move this to tools.h
     void transformPointToGoal(geometry_msgs::Point& point); //move this to tools.h
     void transformPathToGlobal();
+    void publish();
 };
 
-
+void Planner::publish(){
+    trajectoryPublisher.publish(path);
+}
 
 Planner::Planner(ros::NodeHandle nh){
     //todo: check hz of all nodes
@@ -112,65 +116,65 @@ Planner::Planner(ros::NodeHandle nh){
                                                                     14,
                                                                     &Planner::setGrid,
                                                                     this);
+    // We don't need startpos, we will manipulate with robotpose all time (even in the beginning, odometry give us correct data).
+    robotPose               = nh.subscribe<nav_msgs::Odometry>      ("/odometry",
+                                                                    5,
+                                                                    &Planner::setRobotPose,
+                                                                    this);
     clickedPoint            = nh.subscribe<geometry_msgs::PointStamped>
                                                                     ("/clicked_point",
                                                                     50,
                                                                     &Planner::setGoal,
                                                                     this);
-    initialPose             = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
-                                                                    ("/initialpose",
-                                                                    50,
-                                                                    &Planner::setStart,
-                                                                    this);
-    robotPose               = nh.subscribe<nav_msgs::Odometry>      ("/odometry",
-                                                                    5,
-                                                                    &Planner::setRobotPose,
-                                                                    this);
+
+    // We need something for initializing because we must send the trajectory every time we receive /occupancy/accumulated.
+    // this is not enough - other functions must able to send empty paths.
+    goal.point.x = start.x = 299;
+    goal.point.y = start.y = 299;
 }
 
 
 
 void Planner::transformPointToGrid(geometry_msgs::Point& point) {
-    //At first we transform our coordinates refer to robot position
-    point.x = point.x - huskyPose.pose.position.x - isns_link.transform.translation.x;
-    point.y = point.y - huskyPose.pose.position.y + isns_link.transform.translation.y;
-    auto thetta = sgn(2 * asin(grid.info.origin.orientation.y)) * 2 * acos(grid.info.origin.orientation.x);
-    //we rotate goal coordinates to match their orientation with grid system
+    point.x = point.x - huskyPose.pose.position.x;
+    point.y = point.y - huskyPose.pose.position.y;
+
+    auto thetta = atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
+
     auto new_x = point.x * cos(thetta) - point.y * sin(thetta);
     auto new_y = point.x * sin(thetta) + point.y * cos(thetta);
     point.x = new_x;
     point.y = new_y;
-    //then we moves goal system to completely match with grid
-    point.x = point.x - grid.info.origin.position.x;
-    point.y = point.y - grid.info.origin.position.y;
-    point.z = point.z - grid.info.origin.position.z;
-    //and then we transform them to become cell-based
+
     point.x = int(point.x / grid.info.resolution)-1;
     point.y = int(point.y / grid.info.resolution)-1;
+
+    point.x += 299;
+    point.y += 299;
 }
 void Planner::transformPointToGoal(geometry_msgs::Point& point) {
-    //We should perform similar operations as in "to grid" algorithm but in reverse
-    //firstly resize back to global coords
+    point.x -= 299;
+    point.y -= 299;
+
     point.x = (point.x+1) * grid.info.resolution;
     point.y = (point.y+1) * grid.info.resolution;
-    //the move refer to grid origin
-    point.x = point.x + grid.info.origin.position.x;
-    point.y = point.y + grid.info.origin.position.y;
-    point.z = point.z + grid.info.origin.position.z;
-    //then rotate
-    auto thetta = -sgn(2 * asin(grid.info.origin.orientation.y)) * 2 * acos(grid.info.origin.orientation.x);
+
+    auto thetta = -atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
     auto new_x = point.x * cos(thetta) - point.y * sin(thetta);
     auto new_y = point.x * sin(thetta) + point.y * cos(thetta);
     point.x = new_x;
     point.y = new_y;
-    //and move refer to Husky and lidar positions
-    point.x = point.x + huskyPose.pose.position.x + isns_link.transform.translation.x;
-    point.y = point.y + huskyPose.pose.position.y - isns_link.transform.translation.y;
+
+    point.x = point.x + huskyPose.pose.position.x;
+    point.y = point.y + huskyPose.pose.position.y;
 }
 void Planner::transformPathToGlobal() {
-    for(auto element : path.path_points_with_metadata){
-        element.pose.position = transformPointToGlobal(element.pose.position);
+    
+    for(int i=0; i<path.path_points_with_metadata.size(); ++i){
+        transformPointToGlobal(path.path_points_with_metadata[i].pose.position);
     }
+    reverse(path.path_points_with_metadata.begin(), path.path_points_with_metadata.end());
+    
 }
 
 int main(int argc, char **argv){
