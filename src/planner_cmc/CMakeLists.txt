@@ -211,19 +211,9 @@ include_directories(
 
 #set(SOURCES
 #        )
-set(HEADERS        	src/astar/Path.h
-        src/astar/Map.h
-        src/astar/Node.h
-        src/astar/A_search.h
-        src/astar/Open.h
-        src/astar/Closed.h)
+set(HEADERS)
 
-set(SOURCES 		src/astar/Path.cpp
-        src/astar/Map.cpp
-        src/astar/Node.cpp
-        src/astar/A_search.cpp
-        src/astar/Open.cpp
-        src/astar/Closed.cpp)
+set(SOURCES)
 add_executable(planner_cmc
 #                            src/planner_sb.cpp
                             ${HEADERS}
