@@ -139,7 +139,10 @@ void Planner::transformPointToGrid(geometry_msgs::Point& point) {
     point.x = point.x - huskyPose.pose.position.x;
     point.y = point.y - huskyPose.pose.position.y;
 
-    auto thetta = atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
+    // auto thetta = atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
+
+    // seems that the orientation of the map is fixed to below:
+    auto thetta = 1.57079632679;
 
     auto new_x = point.x * cos(thetta) - point.y * sin(thetta);
     auto new_y = point.x * sin(thetta) + point.y * cos(thetta);
@@ -159,7 +162,11 @@ void Planner::transformPointToGlobal(geometry_msgs::Point& point) {
     point.x = (point.x+1) * grid.info.resolution;
     point.y = (point.y+1) * grid.info.resolution;
 
-    auto thetta = -atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
+    // auto thetta = -atan2(huskyPose.pose.orientation.z, huskyPose.pose.orientation.w) * 2.0;
+
+    // seems that the orientation of the map is fixed to below:
+    auto thetta = -1.57079632679;
+
     auto new_x = point.x * cos(thetta) - point.y * sin(thetta);
     auto new_y = point.x * sin(thetta) + point.y * cos(thetta);
     point.x = new_x;
