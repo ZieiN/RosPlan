@@ -188,5 +188,8 @@ int main(int argc, char **argv){
     ros::init(argc, argv, "planner_node");
     ros::NodeHandle nh;
     Planner customPlanner = Planner(nh);
-    ros::spin();
+    while(ros::ok()){
+        ros::spinOnce();
+        customPlanner.publish();
+    }
 }
